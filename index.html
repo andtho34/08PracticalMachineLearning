@@ -105,6 +105,9 @@ names(training)</code></pre>
 ## [49] &quot;accel_forearm_z&quot;      &quot;magnet_forearm_x&quot;     &quot;magnet_forearm_y&quot;    
 ## [52] &quot;magnet_forearm_z&quot;     &quot;classe&quot;</code></pre>
 <pre class="r"><code>##names(validation)</code></pre>
+</div>
+<div id="model-fitting" class="section level2">
+<h2>Model Fitting</h2>
 <p>The training data set is partitioned into a training and testing set. Due to the large number of samples, 5% of the data was selected to train on, which amounted to approximately 1000 samples.</p>
 <pre class="r"><code>inTrain &lt;- createDataPartition(y=training$classe,p=.05,list=FALSE)
 train &lt;- training[inTrain,]
@@ -122,22 +125,43 @@ modFit$finalModel</code></pre>
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 27
 ## 
-##         OOB estimate of  error rate: 9.87%
+##         OOB estimate of  error rate: 8.85%
 ## Confusion matrix:
 ##     A   B   C   D   E class.error
-## A 271   3   3   2   0  0.02867384
-## B  17 154  17   2   0  0.18947368
-## C   0  16 150   3   3  0.12790698
-## D   3   0  10 146   2  0.09316770
-## E   1   7   4   4 165  0.08839779</code></pre>
+## A 270   4   2   2   1  0.03225806
+## B  15 163  11   0   1  0.14210526
+## C   1  10 159   1   1  0.07558140
+## D   2   2  12 144   1  0.10559006
+## E   1   9   6   5 160  0.11602210</code></pre>
 <p>A random forest classification model was fitted, using the variables indicated above as predictors. The random forest algorithm provides internal cross validation.</p>
 <pre class="r"><code>sum(predict(modFit,test)==test$classe)/length(test$classe)</code></pre>
-<pre><code>## [1] 0.9025162</code></pre>
+<pre><code>## [1] 0.9119051</code></pre>
 <p>The accuracy of predicting on the test set is approximately 90%, and this approximates the estimated out of sample error.</p>
+<p>Below are the classes predicted for the unknown validation set.</p>
 <pre class="r"><code>preds &lt;- predict(modFit, validation)
-preds</code></pre>
-<pre><code>##  [1] C A A A A E D B A A C C B A E E A B B B
-## Levels: A B C D E</code></pre>
+df &lt;- data.frame(inds = c(1:20), Prediction =preds)
+df</code></pre>
+<pre><code>##    inds Prediction
+## 1     1          B
+## 2     2          A
+## 3     3          B
+## 4     4          A
+## 5     5          A
+## 6     6          E
+## 7     7          D
+## 8     8          D
+## 9     9          A
+## 10   10          A
+## 11   11          B
+## 12   12          C
+## 13   13          B
+## 14   14          A
+## 15   15          E
+## 16   16          E
+## 17   17          A
+## 18   18          B
+## 19   19          A
+## 20   20          B</code></pre>
 </div>
 
 

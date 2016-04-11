@@ -32,6 +32,7 @@ validation <- validation[,c(which(names(validation)%in%names(training)),dim(vali
 names(training)
 ##names(validation)
 ```
+## Model Fitting
 
 The training data set is partitioned into a training and testing set.  Due to the large number of samples, 5% of the data was selected to train on, which amounted to approximately 1000 samples.
 
@@ -55,6 +56,7 @@ The accuracy of predicting on the test set is approximately 90%, and this approx
 Below are the classes predicted for the unknown validation set.
 ```{r}
 preds <- predict(modFit, validation)
-preds
+df <- data.frame(inds = c(1:20), Prediction =preds)
+df
 ```
 
