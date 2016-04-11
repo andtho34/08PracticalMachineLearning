@@ -1,0 +1,62 @@
+---
+title: |
+  | Practical Machine Learning Course Project
+  | Weightlifting Exercises Classification
+author: "Andrew Thorsen"
+date: "April 10, 2016"
+output: html_document
+---
+
+## Executive Summary
+
+This paper evaluates a random forest classification algorithm on the Weightlifting Exercise Dataset from Velloso, et.al (2013).  Test subjects were asked to perform a bicep curl in five different forms; four incorrect forms, and one correct form.  The subjects were fitted with accelerometers in various locations, such as the arm, dumbell, and belt.  Each sample in the dataset contains acceleration measurements for the bicep curl, and the classification for type of performance.  The performances are classified as "A", "B", "C", "D", and "E".  The validation set provided contains 20 samples of unprovided classification.
+
+## Data Processing
+
+```{r,message=FALSE,warning=FALSE}
+library(caret)
+library(randomForest)
+```
+
+The dataset contains 160 variables, some of which describe a timestamp, and some of which contain NA or missing values.  The dataset must be cleaned of such variables.  The following code subsets the data to contain only the desired acceleration predictor variables, and the class outcome.
+
+```{r,cache=TRUE}
+trainingOriginal <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv")
+validationOriginal <- read.csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv")
+training <- trainingOriginal
+validation <- validationOriginal
+training <- training[,colSums(is.na(training))==0]
+training <- training[,colSums(training=="")==0]
+training <- training[,c(8:60)]
+validation <- validation[,c(which(names(validation)%in%names(training)),dim(validation)[2])]
+names(training)
+##names(validation)
+```
+## Model Fitting
+
+The training data set is partitioned into a training and testing set.  Due to the large number of samples, 5% of the data was selected to train on, which amounted to approximately 1000 samples.
+
+```{r,cache=TRUE}
+inTrain <- createDataPartition(y=training$classe,p=.05,list=FALSE)
+train <- training[inTrain,]
+test <- training[-inTrain,]
+dim(train)
+dim(test)
+modFit <- train(classe~.,data=train,method="rf",prox=TRUE)
+modFit$finalModel
+```
+A random forest classification model was fitted, using the variables indicated above as predictors.  The random forest algorithm provides internal cross validation.
+
+```{r}
+sum(predict(modFit,test)==test$classe)/length(test$classe)
+```
+
+The accuracy of predicting on the test set is approximately 90%, and this approximates the estimated out of sample error.
+
+Below are the classes predicted for the provided unknown validation set.
+```{r}
+preds <- predict(modFit, validation)
+df <- data.frame(inds = c(1:20), Prediction =preds)
+df
+```
+
